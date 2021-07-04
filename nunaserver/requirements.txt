@@ -1,4 +1,6 @@
-# Flask for serving (obviously) + CORS api
+# Flask for serving (obviously) + CORS api + flask security plugins
+flask-seasurf
+flask-talisman
 flask==2.0.1
 flask-cors==3.0.10
 flask-limiter==1.4

@@ -26,6 +26,8 @@ services:
   nunaserver:
     image: uavcan/nunaweb-server:latest
     environment:
+      - CORS_ALLOWED_DOMAINS=*
+      - CSRF_SECRET_KEY=csrf_secret
       - NS_UPLOAD_FOLDER=/nunaserver/uploads
       - NS_REDIS_RESULT=redis://redis
       - NS_REDIS_BROKER=redis://redis:6379/0
@@ -35,8 +37,21 @@ services:
       - NS_MINIO_SECRET_KEY=supersecurepassword
       - NS_LOG_LEVEL=40
     command: [ "gunicorn", "-w 4", "-b 0.0.0.0:8080", "nunaserver.wsgi:app" ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on: 
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_started
   nunaweb:
     image: uavcan/nunaweb-web:latest
+    depends_on: 
+      nunaserver:
+        condition: service_healthy
   minio:
     image: minio/minio:latest
     volumes:

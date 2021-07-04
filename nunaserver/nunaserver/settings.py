@@ -30,5 +30,11 @@ CELERY_RESULT_BACKEND = os.environ.get("NS_REDIS_RESULT") or "redis://localhost"
 CELERY_BROKER_URL = os.environ.get("NS_REDIS_BROKER") or "redis://localhost:6379/0"
 
 # Logging
-LOG_FILE = os.environ.get("NS_LOG_FILE") or "nunaserver.log"
+LOG_FILE = os.environ.get("NS_LOG_FILE") or "stdout"
 LOG_LEVEL = int(os.environ.get("NS_LOG_LEVEL") or logging.WARNING)
+
+# CSRF
+CSRF_SECRET_KEY = os.environ.get("CSRF_SECRET_KEY") or "123abc"
+
+# CORs
+CORS_ALLOWED_DOAMINS = os.environ.get("CORS_ALLOWED_DOMAINS") or "*"

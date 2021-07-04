@@ -34,6 +34,8 @@ services:
     image: uavcan/nunaweb-server:latest
     restart: always
     environment:
+      - CORS_ALLOWED_DOMAINS=https://nunaweb.uavcan.org
+      - CSRF_SECRET_KEY=csrf_secret
       - NS_UPLOAD_FOLDER=/nunaserver/uploads
       - NS_REDIS_RESULT=redis://redis
       - NS_REDIS_BROKER=redis://redis:6379/0
@@ -44,16 +46,15 @@ services:
       - NS_LOG_LEVEL=40
     command: [ "gunicorn", "-w 4", "-b 0.0.0.0:8080", "nunaserver.wsgi:app" ]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 1s
       timeout: 3s
       retries: 60
-    depends_on:
+    depends_on: 
       minio:
         condition: service_healthy
       redis:
         condition: service_started
-
   nunaweb:
     image: uavcan/nunaweb-web:latest
     environment:

@@ -1,5 +1,13 @@
 version: "3"
 services:
+  flower:
+    image: python:latest
+    network_mode: host
+    environment:
+      - LISTEN_PORT=8089
+      - NS_REDIS_BROKER=redis://localhost:6379/0
+      - BASIC_AUTH_TOKENS=admin:12345678
+    command: "bash -c 'pip3 install flower && flower $$NS_REDIS_BROKER --port=$$LISTEN_PORT --address=0.0.0.0 --basic_auth=$$BASIC_AUTH_TOKENS'"
   celery:
     image: python:latest
     volumes:
@@ -24,6 +32,8 @@ services:
       - /tmp:/tmp
     network_mode: host
     environment:
+        # change this
+      - CSRF_SECRET_KEY=abc123
       - NS_UPLOAD_FOLDER=/nunaserver/uploads
       - NS_REDIS_RESULT=redis://localhost
       - NS_REDIS_BROKER=redis://localhost:6379/0
@@ -33,7 +43,18 @@ services:
       - NS_LOG_FOLDER=stderr
       - NS_LOG_LEVEL=20
       - FLASK_ENV=development
+      - CORS_ALLOWED_DOMAINS=*
     command: "bash -c 'cd /nunaserver && pip3 install -r requirements.txt && python3 -m nunaserver'"
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:5000/health"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_started
   minio:
     image: minio/minio:latest
     volumes:

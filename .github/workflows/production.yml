@@ -139,6 +139,7 @@ jobs:
             mv docker-compose.prod.yml docker-compose.yml
             sed -r -i 's/(NS_MINIO_SECRET_KEY=).*$/\1${{ secrets.MINIO_PASSWORD }}/g' docker-compose.yml
             sed -r -i 's/(MINIO_ROOT_PASSWORD=).*$/\1${{ secrets.MINIO_PASSWORD }}/g' docker-compose.yml
+            sed -r -i 's/(CSRF_SECRET_KEY=).*$/\1${{ secrets.CSRF_SECRET_KEY }}/g' docker-compose.yml
             chmod 400 docker-compose.yml
             docker-compose stop
             docker-compose down

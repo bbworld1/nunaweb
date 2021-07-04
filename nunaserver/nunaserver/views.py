@@ -56,7 +56,7 @@ def upload():
     try:
         form = UploadForm(flask.request.form, flask.request.files)
     except ValidationError as error:
-        return flask.jsonify(error.errors)
+        return flask.jsonify(error.errors), 400
 
     for file in form.archive_files:
         size = os.fstat(file.fileno()).st_size
@@ -135,3 +135,12 @@ def taskcancel(task_id):
     task.revoke(terminate=True)
 
     return flask.jsonify({"response": "OK"}), 200
+
+@api.route("/health")
+def health_check():
+    """
+        standard health check endpoint
+        currently no dependency is being health checked
+        but if there is any future dependency health check needs, simply add the code here
+    """
+    return flask.jsonify({"status": "healthy"}), 200
